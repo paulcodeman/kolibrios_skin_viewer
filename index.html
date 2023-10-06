@@ -9,13 +9,19 @@
 </head>
 <body>
 <div class="container">
-    <div class="text-center mt-5">
-        <h2>KolibriOS skin viewer</h2>
-        <p>Выберите файл .skn и нажмите "Просмотреть".</p>
-        <div class="mb-3">
-            <input type="file" class="form-control" id="file-input" accept=".skn">
+    <div class="row text-center">
+        <div class="col">
+            <h2>KolibriOS skin viewer</h2>
+            <p>Выберите файл .skn и нажмите "Просмотреть".</p>
         </div>
-        <button type="button" class="btn btn-primary mt-3" onclick="readSkin()">Просмотреть!</button>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <input type="file" class="form-control mb-3" id="file-input" accept=".skn">
+        </div>
+        <div class="col-md-6">
+            <button type="button" class="btn btn-primary mb-3" onclick="readSkin()">Просмотреть!</button>
+        </div>
     </div>
 
     <div class="block mt-5">

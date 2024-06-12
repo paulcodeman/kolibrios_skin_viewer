@@ -1,6 +1,7 @@
 * {
     box-sizing: border-box;
 }
+
 .window {
     border: 1px solid;
     border-top: none;
@@ -12,39 +13,33 @@
     margin-bottom: 10px;
     overflow: hidden;
 }
+
 .window .inner {
     border: 1px solid;
     height: 250px;
-    margin: 4px;
-    margin-top: 0;
+    margin: 0 4px 4px 4px;
     overflow: hidden;
 }
+
 .window .panel {
     position: relative;
     background-repeat: repeat-x;
 }
-.window .panel .left {
+
+.window .panel .left,
+.window .panel .button,
+.window .panel .close,
+.window .panel .min,
+.window .panel .title {
     position: absolute;
-}
-.window .panel .button {
-    position: absolute;
-}
-.window .panel .close {
-    position: absolute;
-    /* border: 1px dotted red; */
-}
-.window .panel .min {
-    position: absolute;
-    /* border: 1px dotted red; */
 }
 
 .window .panel .title {
-    position: absolute;
     left: 5px;
     top: 0;
-    text-wrap: nowrap;
-    /* font-weight: bold; */
+    white-space: nowrap;
 }
+
 .window button {
     background: white;
     color: #000;
@@ -61,6 +56,7 @@
     margin: auto;
     flex-wrap: wrap;
 }
+
 select {
     padding: 5px;
 }

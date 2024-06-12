@@ -37,6 +37,7 @@ function loadStructureTheme(structure) {
 
     document.querySelectorAll('.title').forEach(item => {
         item.style.color = htmlColor(structure.dtp.window_title);
+        item.style.left = `${structure.margin.left}px`;
     });
 
     structure.bitmap.forEach(item => {

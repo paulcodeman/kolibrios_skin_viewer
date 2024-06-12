@@ -1,219 +1,229 @@
 function htmlColor(color) {
-    return "#" + color;
+    return color.startsWith('#') ? color : `#${color}`;
+}
+
+function toHex(value) {
+    return value.toString(16).padStart(6, '0');
 }
 
 function loadStructureTheme(structure) {
-    var active = document.querySelector('.window.active');
-    var activeInner = active.querySelector('.inner');
-    active.style.borderColor = htmlColor(structure.active.outer);
-    active.style.backgroundColor = htmlColor(structure.active.frame);
-    activeInner.style.borderColor = htmlColor(structure.active.inner);
-    activeInner.style.backgroundColor = htmlColor(structure.dtp.work);
+    const active = document.querySelector('.window.active');
+    const activeInner = active.querySelector('.inner');
+    const inactive = document.querySelector('.window.inactive');
+    const inactiveInner = inactive.querySelector('.inner');
 
-    var inactive = document.querySelector('.window.inactive');
-    var inactiveInner = inactive.querySelector('.inner');
-    inactive.style.borderColor = htmlColor(structure.inactive.outer);
-    inactive.style.backgroundColor = htmlColor(structure.inactive.frame);
-    inactiveInner.style.borderColor = htmlColor(structure.inactive.inner);
-    inactiveInner.style.backgroundColor = htmlColor(structure.dtp.work);
+    const applyStyles = (element, styles) => {
+        Object.keys(styles).forEach(key => {
+            element.style[key] = styles[key];
+        });
+    };
 
-    var title_list = document.querySelectorAll('.title');
-    for (let i = 0; i < title_list.length; i++) {
-        let item = title_list[i];
+    applyStyles(active, {
+        borderColor: htmlColor(structure.active.outer),
+        backgroundColor: htmlColor(structure.active.frame)
+    });
+    applyStyles(activeInner, {
+        borderColor: htmlColor(structure.active.inner),
+        backgroundColor: htmlColor(structure.dtp.work)
+    });
+    applyStyles(inactive, {
+        borderColor: htmlColor(structure.inactive.outer),
+        backgroundColor: htmlColor(structure.inactive.frame)
+    });
+    applyStyles(inactiveInner, {
+        borderColor: htmlColor(structure.inactive.inner),
+        backgroundColor: htmlColor(structure.dtp.work)
+    });
+
+    document.querySelectorAll('.title').forEach(item => {
         item.style.color = htmlColor(structure.dtp.window_title);
-    }
+    });
 
-    for (let i = 0; i < structure.bitmap.length; i++) {
-        let item = structure.bitmap[i];
+    structure.bitmap.forEach(item => {
         let element = item.type ? active : inactive;
         let panel = element.querySelector('.panel');
         let button = element.querySelector('.button');
         let left = element.querySelector('.left');
-        let title = element.querySelector('.title');
         if (item.kind === 3) {
-            panel.style.backgroundImage = "url(" + item.base64 + ')';
-            panel.style.height = item.height + 'px';
+            applyStyles(panel, {
+                backgroundImage: `url(${item.base64})`,
+                height: `${item.height}px`
+            });
         } else if (item.kind === 2) {
-            button.style.backgroundImage = "url(" + item.base64 + ')';
-            button.style.height = item.height + 'px';
-            button.style.width = item.width + 'px';
-            button.style.right = '-1px';
+            applyStyles(button, {
+                backgroundImage: `url(${item.base64})`,
+                height: `${item.height}px`,
+                width: `${item.width}px`,
+                right: '-1px'
+            });
         } else if (item.kind === 1) {
-            left.style.backgroundImage = "url(" + item.base64 + ')';
-            left.style.height = item.height + 'px';
-            left.style.width = item.width + 'px';
-            left.style.left = '-1px';
-//title.style.left = (item.width-1)+'px';
+            applyStyles(left, {
+                backgroundImage: `url(${item.base64})`,
+                height: `${item.height}px`,
+                width: `${item.width}px`,
+                left: '-1px'
+            });
         }
-    }
+    });
 
-    for (let i = 0; i < structure.button.length; i++) {
-        let item = structure.button[i];
-        if (item.type === 1) {
-            let inactive_min = inactive.querySelector('.min');
-            let active_min = active.querySelector('.min');
+    structure.button.forEach(item => {
+        let inactiveButton = item.type === 1 ? inactive.querySelector('.min') : inactive.querySelector('.close');
+        let activeButton = item.type === 1 ? active.querySelector('.min') : active.querySelector('.close');
+        applyStyles(activeButton, {
+            top: `${item.top}px`,
+            right: `${-structure.margin.left + structure.margin.right + item.left}px`,
+            height: `${item.height}px`,
+            width: `${item.width}px`
+        });
+        applyStyles(inactiveButton, {
+            top: `${item.top}px`,
+            right: `${-structure.margin.left + structure.margin.right + item.left}px`,
+            height: `${item.height}px`,
+            width: `${item.width}px`
+        });
+    });
 
-            active_min.style.top = inactive_min.style.top = item.top + 'px';
-            active_min.style.right = inactive_min.style.right = -structure.margin.left + structure.margin.right + item.left + 'px';
-            active_min.style.height = inactive_min.style.height = item.height + 'px';
-            active_min.style.width = inactive_min.style.width = item.width + 'px';
-        } else {
-            let inactive_close = inactive.querySelector('.close');
-            let active_close = active.querySelector('.close');
+    document.querySelectorAll('.window button').forEach(item => {
+        applyStyles(item, {
+            backgroundColor: htmlColor(structure.dtp.work_button),
+            color: htmlColor(structure.dtp.work_button_text)
+        });
+    });
 
-            active_close.style.top = inactive_close.style.top = item.top + 'px';
-            active_close.style.right = inactive_close.style.right = -structure.margin.left + structure.margin.right + item.left + 'px';
-            active_close.style.height = inactive_close.style.height = item.height + 'px';
-            active_close.style.width = inactive_close.style.width = item.width + 'px';
-        }
-    }
-
-    var guibutton = document.querySelectorAll('.window button');
-    for (let i = 0; i < guibutton.length; i++) {
-        let item = guibutton[i];
-        item.style.backgroundColor = htmlColor(structure.dtp.work_button);
-        item.style.color = htmlColor(structure.dtp.work_button_text);
-    }
-
-    var guitext = document.querySelectorAll('.window span');
-    for (let i = 0; i < guitext.length; i++) {
-        let item = guitext[i];
+    document.querySelectorAll('.window span').forEach(item => {
         item.style.color = htmlColor(structure.dtp.work_text);
-    }
+    });
 }
-
 function readSkin() {
-    const SKIN_MAGIC = 0x4E494B53 // 'SKIN'
-    const KPACK_MAGIC = 0x4B43504B // 'KPACK'
+    const SKIN_MAGIC = 0x4E494B53; // 'SKIN'
+    const KPACK_MAGIC = 0x4B43504B; // 'KPACK'
 
     const file = document.getElementById('file-input').files[0];
     const reader = new FileReader();
+
     reader.onload = function (e) {
         let skinBytes = e.target.result;
         let skinData = new DataView(skinBytes);
-        let skinObj = new Object();
+        let skinObj = {};
 
-        magic = skinData.getUint32(0, true);
-        if (magic == KPACK_MAGIC) {
+        let magic = skinData.getUint32(0, true);
+        if (magic === KPACK_MAGIC) {
             try {
                 skinData = unpack(skinData);
-            } catch (e) {
-                alert('Unpacking error: ' + e);
+            } catch (error) {
+                alert(`Unpacking error: ${error}`);
                 return;
             }
         }
 
         magic = skinData.getUint32(0, true);
-        if (magic != SKIN_MAGIC) {
+        if (magic !== SKIN_MAGIC) {
             alert('The uploaded file is not a skin!');
             return;
         }
 
-        skinObj.version = skinData.getUint32(4, true); // second param - little endian
+        skinObj.version = skinData.getUint32(4, true);
 
-        let params = skinData.getUint32(8, true),
+        const params = skinData.getUint32(8, true),
             buttons = skinData.getUint32(12, true),
             bitmaps = skinData.getUint32(16, true);
 
-// alert(params + " " + buttons + " " + bitmaps)
+        const parseMargins = (offset) => ({
+            right: skinData.getUint16(offset + 4, true),
+            left: skinData.getUint16(offset + 6, true),
+            bottom: skinData.getUint16(offset + 8, true),
+            top: skinData.getUint16(offset + 10, true)
+        });
 
-        skinObj.margin = new Object();
-        skinObj.margin.right = skinData.getUint16(params + 4, true);
-        skinObj.margin.left = skinData.getUint16(params + 6, true);
-        skinObj.margin.bottom = skinData.getUint16(params + 8, true);
-        skinObj.margin.top = skinData.getUint16(params + 10, true);
+        const parseColors = (offset) => ({
+            inner: toHex(skinData.getUint32(offset + 12, true)),
+            outer: toHex(skinData.getUint32(offset + 16, true)),
+            frame: toHex(skinData.getUint32(offset + 20, true))
+        });
 
-        let pad = function (num, len, rdx) {
-            num = num.toString(rdx);
-            while (num.length < len) num = "0" + num;
-            return num;
-        }
+        const parseDTP = (offset) => ({
+            size: skinData.getUint32(offset + 36, true),
+            taskbar: toHex(skinData.getUint32(offset + 40, true)),
+            taskbar_text: toHex(skinData.getUint32(offset + 44, true)),
+            work_dark: toHex(skinData.getUint32(offset + 48, true)),
+            work_light: toHex(skinData.getUint32(offset + 52, true)),
+            window_title: toHex(skinData.getUint32(offset + 56, true)),
+            work: toHex(skinData.getUint32(offset + 60, true)),
+            work_button: toHex(skinData.getUint32(offset + 64, true)),
+            work_button_text: toHex(skinData.getUint32(offset + 68, true)),
+            work_text: toHex(skinData.getUint32(offset + 72, true)),
+            work_graph: toHex(skinData.getUint32(offset + 76, true))
+        });
 
-        H6 = function (x) {
-            return pad(x & 0x00FFFFFF, 6, 16)
+        skinObj.margin = parseMargins(params);
+        skinObj.active = parseColors(params);
+        skinObj.inactive = parseColors(params + 12);
+        skinObj.dtp = parseDTP(params);
+
+        const parseButtons = (offset) => {
+            let buttons = [];
+            while (skinData.getUint32(offset, true) !== 0) {
+                buttons.push({
+                    type: skinData.getUint32(offset, true),
+                    left: skinData.getInt16(offset + 4, true),
+                    top: skinData.getInt16(offset + 6, true),
+                    width: skinData.getUint16(offset + 8, true),
+                    height: skinData.getUint16(offset + 10, true)
+                });
+                offset += 12;
+            }
+            return buttons;
         };
 
-        skinObj.active = new Object();
-        skinObj.active.inner = H6(skinData.getUint32(params + 12, true));
-        skinObj.active.outer = H6(skinData.getUint32(params + 16, true));
-        skinObj.active.frame = H6(skinData.getUint32(params + 20, true));
+        const parseBitmaps = (offset) => {
+            let bitmaps = [];
+            while (skinData.getUint32(offset, true) !== 0) {
+                let kind = skinData.getUint16(offset, true);
+                let type = skinData.getUint16(offset + 2, true);
+                let posbm = skinData.getUint32(offset + 4, true);
+                let width = skinData.getUint32(posbm, true);
+                let height = skinData.getUint32(posbm + 4, true);
 
-        skinObj.inactive = new Object();
-        skinObj.inactive.inner = H6(skinData.getUint32(params + 24, true));
-        skinObj.inactive.outer = H6(skinData.getUint32(params + 28, true));
-        skinObj.inactive.frame = H6(skinData.getUint32(params + 32, true));
+                let canvas = document.createElement("canvas");
+                canvas.width = width;
+                canvas.height = height;
+                let ctx = canvas.getContext("2d");
+                let canvasData = ctx.getImageData(0, 0, width, height);
 
-        skinObj.dtp = new Object();
-        skinObj.dtp.size = skinData.getUint32(params + 36, true);
-        skinObj.dtp.taskbar = H6(skinData.getUint32(params + 40, true));
-        skinObj.dtp.taskbar_text = H6(skinData.getUint32(params + 44, true));
-        skinObj.dtp.work_dark = H6(skinData.getUint32(params + 48, true));
-        skinObj.dtp.work_light = H6(skinData.getUint32(params + 52, true));
-        skinObj.dtp.window_title = H6(skinData.getUint32(params + 56, true));
-        skinObj.dtp.work = H6(skinData.getUint32(params + 60, true));
-        skinObj.dtp.work_button = H6(skinData.getUint32(params + 64, true));
-        skinObj.dtp.work_button_text = H6(skinData.getUint32(params + 68, true));
-        skinObj.dtp.work_text = H6(skinData.getUint32(params + 72, true));
-        skinObj.dtp.work_graph = H6(skinData.getUint32(params + 76, true));
+                for (let y = 0; y < height; y++) {
+                    for (let x = 0; x < width; x++) {
+                        let i = (x + y * width) * 3;
+                        let bb = skinData.getUint8(posbm + 8 + i);
+                        let gg = skinData.getUint8(posbm + 8 + i + 1);
+                        let rr = skinData.getUint8(posbm + 8 + i + 2);
 
-        skinObj.button = [];
-        let pos = buttons;
-        while (skinData.getUint32(pos, true) != 0) {
-            let btn = new Object();
-            btn.type = skinData.getUint32(pos, true);
-            btn.left = skinData.getInt16(pos + 4, true);
-            btn.top = skinData.getInt16(pos + 6, true);
-            btn.width = skinData.getUint16(pos + 8, true);
-            btn.height = skinData.getUint16(pos + 10, true);
-            skinObj.button.push(btn);
-            pos += 12;
-        }
-
-        skinObj.bitmap = [];
-        pos = bitmaps;
-        while (skinData.getUint32(pos, true) != 0) {
-            let bmp = new Object();
-            bmp.kind = skinData.getUint16(pos, true);
-            bmp.type = skinData.getUint16(pos + 2, true);
-            let posbm = skinData.getUint32(pos + 4, true);
-            bmp.width = skinData.getUint32(posbm, true);
-            bmp.height = skinData.getUint32(posbm + 4, true);
-            let size = bmp.width * bmp.height * 3;
-
-            let canvas = document.createElement("canvas");
-            canvas.width = bmp.width;
-            canvas.height = bmp.height;
-            let ctx = canvas.getContext("2d");
-            let canvasData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-
-            for (let y = 0; y < bmp.height; y++) {
-                for (let x = 0; x < bmp.width; x++) {
-                    let i = (x + y * bmp.width) * 3;
-                    let bb = skinData.getUint8(posbm + 8 + i);
-                    let gg = skinData.getUint8(posbm + 8 + i + 1);
-                    let rr = skinData.getUint8(posbm + 8 + i + 2);
-
-                    i = (x + y * canvas.width) * 4;
-                    canvasData.data[i + 0] = rr;
-                    canvasData.data[i + 1] = gg;
-                    canvasData.data[i + 2] = bb;
-                    canvasData.data[i + 3] = 255;
+                        let pixelIndex = (x + y * width) * 4;
+                        canvasData.data[pixelIndex] = rr;
+                        canvasData.data[pixelIndex + 1] = gg;
+                        canvasData.data[pixelIndex + 2] = bb;
+                        canvasData.data[pixelIndex + 3] = 255;
+                    }
                 }
+                ctx.putImageData(canvasData, 0, 0);
+
+                bitmaps.push({
+                    kind,
+                    type,
+                    width,
+                    height,
+                    base64: canvas.toDataURL()
+                });
+                offset += 8;
             }
-            ctx.putImageData(canvasData, 0, 0);
-            bmp.base64 = canvas.toDataURL();
+            return bitmaps;
+        };
 
-            skinObj.bitmap.push(bmp);
-            pos += 8;
-        }
-
-// alert(JSON.stringify(skinObj));
+        skinObj.button = parseButtons(buttons);
+        skinObj.bitmap = parseBitmaps(bitmaps);
 
         loadStructureTheme(skinObj);
-        let list = document.getElementsByClassName('window');
-        for (let i = 0; i < list.length; i++) {
-            list[i].style.display = 'block';
-        }
-    }
+        document.querySelectorAll('.window').forEach(window => window.style.display = 'block');
+    };
+
     reader.readAsArrayBuffer(file);
 }

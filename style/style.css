@@ -10,12 +10,14 @@
     font-size: 14px;
     user-select: none;
     margin-bottom: 10px;
+    overflow: hidden;
 }
 .window .inner {
     border: 1px solid;
     height: 250px;
     margin: 4px;
     margin-top: 0;
+    overflow: hidden;
 }
 .window .panel {
     position: relative;
@@ -40,6 +42,7 @@
     position: absolute;
     left: 5px;
     top: 4px;
+    text-wrap: nowrap;
     /* font-weight: bold; */
 }
 .window button {

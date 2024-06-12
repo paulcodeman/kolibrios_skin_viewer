@@ -218,8 +218,8 @@ class SkinLoader {
         let magic = skinData.getUint32(0, true);
         if (magic === this.KPACK_MAGIC) {
             try {
-                const unpacker = new KPacker(skinData);
-                skinData = unpacker.unpack();
+                const unpacker = new KPacker();
+                skinData = unpacker.unpack(skinData);
             } catch (error) {
                 alert(`Unpacking error: ${error}`);
                 return;

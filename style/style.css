@@ -55,8 +55,9 @@
 .block {
     display: flex;
     align-items: center;
-    justify-content: space-around;
+    justify-content: center;
     max-width: 800px;
+    min-height: calc(100vh - 392px);
     margin: auto;
     flex-wrap: wrap;
 }

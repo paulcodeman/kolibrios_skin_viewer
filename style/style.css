@@ -41,7 +41,7 @@
 .window .panel .title {
     position: absolute;
     left: 5px;
-    top: 4px;
+    top: 0;
     text-wrap: nowrap;
     /* font-weight: bold; */
 }

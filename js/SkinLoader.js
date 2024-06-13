@@ -1,7 +1,8 @@
 class SkinLoader {
     constructor() {
         this.SKIN_MAGIC = 0x4E494B53; // 'SKIN'
-        this.KPACK_MAGIC = 0x4B43504B; // 'KPACK'
+        this.KPACK_MAGIC = 0x4B43504B; // 'KPCK'
+        this.name = 'theme.skn';
 
         // Создаем кеш для изображений, чтобы не загружать их несколько раз
         this.imageCache = {};
@@ -99,30 +100,30 @@ class SkinLoader {
             }
         });
 
-        object.querySelectorAll('.window button').forEach(item => {
+        object.querySelectorAll('button').forEach(item => {
             this.applyStyles(item, {
                 backgroundColor: this.htmlColor(structure.dtp.work_button),
                 color: this.htmlColor(structure.dtp.work_button_text)
             });
         });
 
-        object.querySelectorAll('.window span').forEach(item => {
+        object.querySelectorAll('span').forEach(item => {
             item.style.color = this.htmlColor(structure.dtp.work_text);
         });
     }
 
     loadStructureTheme(structure) {
         document.querySelectorAll('.window').forEach(w => {
+            let title = w.querySelector('.title');
+            title.style.color = this.htmlColor(structure.dtp.window_title);
+            title.style.left = `${structure.margin.left}px`;
             this.loadWindowStructureTheme(w, structure);
-            w.querySelectorAll('.title').forEach(item => {
-                item.style.color = this.htmlColor(structure.dtp.window_title);
-                item.style.left = `${structure.margin.left}px`;
-            });
         });
     }
 
     parseMargins(skinData, offset) {
         return {
+            height: skinData.getUint32(offset, true),
             right: skinData.getUint16(offset + 4, true),
             left: skinData.getUint16(offset + 6, true),
             bottom: skinData.getUint16(offset + 8, true),
@@ -212,14 +213,176 @@ class SkinLoader {
         return bitmaps;
     }
 
+    base64ToUint8Array(base64) {
+        const binaryString = atob(base64.split(',')[1]);
+        const bytes = new Uint8Array(binaryString.length);
+        for (let i = 0; i < binaryString.length; i++) {
+            bytes[i] = binaryString.charCodeAt(i);
+        }
+        return bytes;
+    }
+
+    base64ToRGBArray(base64) {
+        const img = new Image();
+        img.src = base64;
+
+        // Создаем canvas и контекст
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Устанавливаем размер canvas равным размеру изображения
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        // Рисуем изображение на canvas
+        ctx.drawImage(img, 0, 0);
+
+        // Получаем данные изображения
+        const imageData = ctx.getImageData(0, 0, img.width, img.height);
+        const data = imageData.data;
+
+        // Создаем массив RGB
+        const rgbArray = [];
+        for (let i = 0; i < data.length; i += 4) {
+            const rr = data[i];
+            const gg = data[i + 1];
+            const bb = data[i + 2];
+            rgbArray.push(bb, gg, rr);
+        }
+
+        return rgbArray;
+    }
+
+    save(structure) {
+        // Allocate 1MB of memory initially
+        const skinData = new Uint8Array(1024 * 1024);
+        const dataView = new DataView(skinData.buffer);
+        let offset = 0;
+
+        // Write the magic number 'SKIN'
+        dataView.setUint32(offset, this.SKIN_MAGIC, true);
+        offset += 4;
+
+        // Skin version (set to 1)
+        dataView.setUint32(offset, 1, true);
+        offset += 4;
+
+        // Offsets for params, buttons, and bitmaps (placeholders for now)
+        const paramsOffset = offset;
+        offset += 12;
+
+        // Write margins
+        dataView.setUint32(offset, structure.margin.height, true);
+        offset += 4;
+        dataView.setUint16(offset, structure.margin.right, true);
+        dataView.setUint16(offset + 2, structure.margin.left, true);
+        dataView.setUint16(offset + 4, structure.margin.bottom, true);
+        dataView.setUint16(offset + 6, structure.margin.top, true);
+        offset += 8;
+
+        // Write colors for active state
+        dataView.setUint32(offset, parseInt(structure.active.inner.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 4, parseInt(structure.active.outer.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 8, parseInt(structure.active.frame.replace('#', ''), 16), true);
+        offset += 12;
+
+        // Write colors for inactive state
+        dataView.setUint32(offset, parseInt(structure.inactive.inner.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 4, parseInt(structure.inactive.outer.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 8, parseInt(structure.inactive.frame.replace('#', ''), 16), true);
+        offset += 12;
+
+        // Write DTP
+        dataView.setUint32(offset, structure.dtp.size, true);
+        dataView.setUint32(offset + 4, parseInt(structure.dtp.taskbar.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 8, parseInt(structure.dtp.taskbar_text.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 12, parseInt(structure.dtp.work_dark.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 16, parseInt(structure.dtp.work_light.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 20, parseInt(structure.dtp.window_title.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 24, parseInt(structure.dtp.work.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 28, parseInt(structure.dtp.work_button.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 32, parseInt(structure.dtp.work_button_text.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 36, parseInt(structure.dtp.work_text.replace('#', ''), 16), true);
+        dataView.setUint32(offset + 40, parseInt(structure.dtp.work_graph.replace('#', ''), 16), true);
+        offset += 44;
+
+        // Write buttons
+        const buttonsOffset = offset;
+        structure.button.forEach(button => {
+            dataView.setUint32(offset, button.type, true);
+            dataView.setInt16(offset + 4, button.left, true);
+            dataView.setInt16(offset + 6, button.top, true);
+            dataView.setUint16(offset + 8, button.width, true);
+            dataView.setUint16(offset + 10, button.height, true);
+            offset += 12;
+        });
+        dataView.setUint32(offset, 0, true); // End of button list
+        offset += 4;
+
+        // Write bitmaps
+        const bitmapsOffset = offset;
+        let bitmapPointer = [];
+        structure.bitmap.forEach(bitmap => {
+            // Write kind, type, and bitmap data offset
+            dataView.setUint16(offset, bitmap.kind, true);
+            dataView.setUint16(offset + 2, bitmap.type, true);
+            bitmapPointer[bitmapPointer.length] = offset + 4; // Offset to bitmap data
+            offset += 8;
+        });
+        dataView.setUint32(offset, 0, true); // End of bitmap list
+        offset += 4;
+
+        let position = 0;
+        structure.bitmap.forEach(bitmap => {
+            dataView.setUint32(bitmapPointer[position++], offset, true); // Set bitmap pointer data
+
+            // Decode base64 to Uint8Array
+            let imageData = this.base64ToRGBArray(bitmap.base64);
+
+            // Write image width and height
+            dataView.setUint32(offset, bitmap.width, true);
+            dataView.setUint32(offset + 4, bitmap.height, true);
+            offset += 8;
+
+            // Write pixel data
+            skinData.set(imageData, offset);
+            offset += imageData.length;
+        });
+
+        // Update offsets in the header
+        dataView.setUint32(paramsOffset, paramsOffset + 12, true);
+        dataView.setUint32(paramsOffset + 4, buttonsOffset, true);
+        dataView.setUint32(paramsOffset + 8, bitmapsOffset, true);
+
+        let packData;
+        try {
+            const kpacker = new KPacker();
+            packData = skinData.slice(0, offset); // slice data
+            packData = kpacker.pack(new DataView(packData.buffer)); // compress data
+        } catch (error) {
+            alert(`Packing error: ${error}`);
+            return;
+        }
+
+        // Create Blob and download link
+        const blob = new Blob([packData], { type: 'application/octet-stream' });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', this.name);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
     read(skinData) {
         let skinObj = {};
 
         let magic = skinData.getUint32(0, true);
         if (magic === this.KPACK_MAGIC) {
             try {
-                const unpacker = new KPacker();
-                skinData = unpacker.unpack(skinData);
+                const kpacker = new KPacker();
+                skinData = kpacker.unpack(skinData);
             } catch (error) {
                 alert(`Unpacking error: ${error}`);
                 return;
@@ -245,7 +408,35 @@ class SkinLoader {
         skinObj.button = this.parseButtons(skinData, buttons);
         skinObj.bitmap = this.parseBitmaps(skinData, bitmaps);
 
+        let createSetter = (obj) => {
+            for (let prop in obj) {
+                if (obj.hasOwnProperty(prop)) {
+                    let _value = obj[prop];
+                    if (typeof _value === 'object' && _value !== null) {
+                        _value = createSetter(_value);
+                    }
+                    Object.defineProperty(obj, prop, {
+                        set: (value) => {
+                            if (typeof value === 'object' && value !== null) {
+                                value = createSetter(value);
+                            }
+                            _value = value;
+                            this.loadStructureTheme(skinObj);
+                        },
+                        get: () => {
+                            return _value;
+                        }
+                    });
+                }
+            }
+            return obj;
+        }
+
+        skinObj = createSetter(skinObj);
+
         this.loadStructureTheme(skinObj);
         document.querySelectorAll('.window').forEach(window => window.style.display = 'block');
+
+        return skinObj;
     }
 }

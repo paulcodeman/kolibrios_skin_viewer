@@ -8,51 +8,113 @@
     <link rel="stylesheet" href="style/SkinLoader.css">
     <link rel="stylesheet" href="style/style.css">
 </head>
-<body class="d-flex flex-column h-100">
+<body class="d-flex flex-column h-100" style="width:calc(100% - 15px)">
 <header class="bg-light py-3 border-bottom shadow-sm">
     <div class="container text-center">
-        <h1>KolibriOS skin viewer</h1>
+        <h1>KolibriOS skin</h1>
     </div>
 </header>
 <main>
-    <div class="container my-4">
-        <div class="text-center m-auto border rounded shadow p-3" style="max-width:600px">
-            <p>Выберите файл .skn и нажмите "Просмотреть".</p>
-            <input type="file" class="form-control mb-3 mx-auto" id="file-input" accept=".skn" aria-label="Выберите файл .skn">
-            <button type="button" class="btn btn-primary mb-3" onclick="readSkin()">Просмотреть!</button>
+    <div class="row">
+        <div class="col-12">
+            <div class="my-4">
+                <div class="text-center m-auto border rounded shadow p-3"
+                     style="max-width:600px">
+                    <p>Выберите файл .skn и нажмите "Загрузить".</p>
+                    <input type="file" class="form-control mb-3 mx-auto" id="file-input" accept=".skn"
+                           aria-label="Выберите файл .skn">
+                    <div>
+                        <button type="button" class="btn btn-primary mb-3" onclick="skinManager.read()">
+                            Загрузить
+                        </button>
+                        <button type="button" class="btn btn-success mb-3" onclick="skinManager.save()">
+                            Сохранить
+                        </button>
+                    </div>
+                </div>
+                <div class="block my-3">
+                    <div class="row w-100">
+                        <div class="col-md-6 mb-4">
+                            <div class="mx-auto window" data-status="active">
+                                <div class="panel">
+                                    <div class="left"></div>
+                                    <div class="title">Активное окно</div>
+                                    <div class="button"></div>
+                                    <div class="close"></div>
+                                    <div class="min"></div>
+                                </div>
+                                <div class="inner">
+                                    <button>Текст на кнопке</button>
+                                    <br><span>Текст в окне</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="mx-auto window" data-status="inactive">
+                                <div class="panel">
+                                    <div class="left"></div>
+                                    <div class="title">Неактивное окно</div>
+                                    <div class="button"></div>
+                                    <div class="close"></div>
+                                    <div class="min"></div>
+                                </div>
+                                <div class="inner">
+                                    <button>Текст на кнопке</button>
+                                    <br><span>Текст в окне</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="block my-3">
-            <div class="row w-100">
-                <div class="col-md-6 mb-4">
-                    <div class="mx-auto window" data-status="active">
-                        <div class="panel">
-                            <div class="left"></div>
-                            <div class="title">Активное окно</div>
-                            <div class="button"></div>
-                            <div class="close"></div>
-                            <div class="min"></div>
-                        </div>
-                        <div class="inner">
-                            <button>Текст на кнопке</button>
-                            <br><span>Текст в окне</span>
-                        </div>
-                    </div>
+        <div class="col-md-2 d-none bg-light border-start overflow-auto" style="max-height: calc(100vh - 150px)">
+            <br>
+            <h2 class="text-center">
+                Свойства
+            </h2>
+            <hr>
+            <div class="mb-3 field-color d-none">
+                <label class="form-label">Label</label>
+                <div class="input-group">
+                    <input type="color"
+                           required
+                           class="form-control form-control-color"
+                           value="#563d7c">
+                    <input type="text"
+                           class="form-control"
+                           required
+                           pattern="^#([A-Fa-f0-9]{6})$">
                 </div>
-                <div class="col-md-6 mb-4">
-                    <div class="mx-auto window" data-status="inactive">
-                        <div class="panel">
-                            <div class="left"></div>
-                            <div class="title">Неактивное окно</div>
-                            <div class="button"></div>
-                            <div class="close"></div>
-                            <div class="min"></div>
-                        </div>
-                        <div class="inner">
-                            <button>Текст на кнопке</button>
-                            <br><span>Текст в окне</span>
-                        </div>
-                    </div>
+            </div>
+            <div class="mb-3 field-integer d-none">
+                <label class="form-label">Label</label>
+                <div class="input-group">
+                    <input type="number" class="form-control" aria-describedby="basic-addon3 basic-addon4">
                 </div>
+            </div>
+            <div id="active">
+                <h4 class="text-center">Active</h4>
+            </div>
+            <hr>
+            <div id="inactive">
+                <h4 class="text-center">Inactive</h4>
+            </div>
+            <hr>
+            <div id="dtp">
+                <h4 class="text-center">DTP</h4>
+            </div>
+            <hr>
+            <div id="margin">
+                <h4 class="text-center">Margin</h4>
+            </div>
+            <hr>
+            <div id="close">
+                <h4 class="text-center">Close button</h4>
+            </div>
+            <hr>
+            <div id="min">
+                <h4 class="text-center">Min button</h4>
             </div>
         </div>
     </div>

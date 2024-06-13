@@ -21,27 +21,27 @@ class SkinLoader {
                     top: DataType.WORD
                 },
                 active: {
-                    inner: DataType.HEX6,
-                    outer: DataType.HEX6,
-                    frame: DataType.HEX6
+                    inner: DataType.COLOR,
+                    outer: DataType.COLOR,
+                    frame: DataType.COLOR
                 },
                 inactive: {
-                    inner: DataType.HEX6,
-                    outer: DataType.HEX6,
-                    frame: DataType.HEX6
+                    inner: DataType.COLOR,
+                    outer: DataType.COLOR,
+                    frame: DataType.COLOR
                 },
                 dtp: {
                     size: DataType.DWORD,
-                    taskbar: DataType.HEX6,
-                    taskbar_text: DataType.HEX6,
-                    work_dark: DataType.HEX6,
-                    work_light: DataType.HEX6,
-                    window_title: DataType.HEX6,
-                    work: DataType.HEX6,
-                    work_button: DataType.HEX6,
-                    work_button_text: DataType.HEX6,
-                    work_text: DataType.HEX6,
-                    work_graph: DataType.HEX6
+                    taskbar: DataType.COLOR,
+                    taskbar_text: DataType.COLOR,
+                    work_dark: DataType.COLOR,
+                    work_light: DataType.COLOR,
+                    window_title: DataType.COLOR,
+                    work: DataType.COLOR,
+                    work_button: DataType.COLOR,
+                    work_button_text: DataType.COLOR,
+                    work_text: DataType.COLOR,
+                    work_graph: DataType.COLOR
                 }
             },
             '#buttons:3': {
@@ -93,10 +93,6 @@ class SkinLoader {
         };
     }
 
-    htmlColor(color) {
-        return color.startsWith('#') ? color : `#${color}`;
-    }
-
     applyStyles(element, styles) {
         Object.keys(styles).forEach(key => {
             element.style[key] = styles[key];
@@ -121,12 +117,12 @@ class SkinLoader {
         const activeInner = active.querySelector('.inner');
 
         this.applyStyles(active, {
-            borderColor: this.htmlColor(structure.params[status].outer),
-            backgroundColor: this.htmlColor(structure.params[status].frame)
+            borderColor: structure.params[status].outer,
+            backgroundColor: structure.params[status].frame
         });
         this.applyStyles(activeInner, {
-            borderColor: this.htmlColor(structure.params[status].inner),
-            backgroundColor: this.htmlColor(structure.params.dtp.work)
+            borderColor: structure.params[status].inner,
+            backgroundColor: structure.params.dtp.work
         });
 
         structure.bitmaps.forEach(item => {
@@ -183,20 +179,20 @@ class SkinLoader {
 
         object.querySelectorAll('button').forEach(item => {
             this.applyStyles(item, {
-                backgroundColor: this.htmlColor(structure.params.dtp.work_button),
-                color: this.htmlColor(structure.params.dtp.work_button_text)
+                backgroundColor: structure.params.dtp.work_button,
+                color: structure.params.dtp.work_button_text
             });
         });
 
         object.querySelectorAll('span').forEach(item => {
-            item.style.color = this.htmlColor(structure.params.dtp.work_text);
+            item.style.color = structure.params.dtp.work_text;
         });
     }
 
     loadStructureTheme(structure) {
         document.querySelectorAll('.window').forEach(w => {
             let title = w.querySelector('.title');
-            title.style.color = this.htmlColor(structure.params.dtp.window_title);
+            title.style.color = structure.params.dtp.window_title;
             title.style.left = `${structure.params.margin.left}px`;
             this.loadWindowStructureTheme(w, structure);
         });

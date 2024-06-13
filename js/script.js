@@ -63,8 +63,8 @@ class SkinManager {
                 const label = field.querySelector('label');
 
                 label.innerText = prop + ':';
-                color.value = '#' + value;
-                text.value = '#' + value;
+                color.value = value;
+                text.value = value;
 
                 text.oninput = color.oninput = function() {
                     this.value = this.value.toUpperCase();
@@ -73,7 +73,7 @@ class SkinManager {
 
                 color.oninput = text.oninput = text.onchange = color.onchange = function() {
                     if (this.checkValidity()) {
-                        object[prop] = this.value.substring(1);
+                        object[prop] = this.value;
                         text.value = this.value;
                         color.value = this.value;
                     }

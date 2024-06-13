@@ -108,12 +108,12 @@ class SkinManager {
             element.remove();
         });
 
-        this.genFields(structure.dtp, '#dtp');
-        this.genFields(structure.active, '#active');
-        this.genFields(structure.inactive, '#inactive');
-        this.genFields(structure.margin, '#margin');
-        this.genFields(structure.button[0], '#close');
-        this.genFields(structure.button[1], '#min');
+        this.genFields(structure.params.dtp, '#dtp');
+        this.genFields(structure.params.active, '#active');
+        this.genFields(structure.params.inactive, '#inactive');
+        this.genFields(structure.params.margin, '#margin');
+        this.genFields(structure.buttons[0], '#close');
+        this.genFields(structure.buttons[1], '#min');
 
         document.querySelector('.col-md-2').classList.add('d-md-block');
         document.querySelector('.col-12').classList.add('col-md-10');
@@ -121,3 +121,4 @@ class SkinManager {
 }
 
 let skinManager = new SkinManager();
+
